@@ -7,7 +7,7 @@ os:
   - osx
 
 env:
-  - SLN=client.sln
+  - SLN=Client.sln
     TARGET=NET45
     VERSION=Release
 
