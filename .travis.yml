@@ -7,7 +7,7 @@ os:
   - osx
 
 env:
-  - SLN=CoAP.NET45.sln
+  - SLN=client.sln
     TARGET=NET45
     VERSION=Release
 
