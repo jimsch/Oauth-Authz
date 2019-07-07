@@ -28,6 +28,8 @@ namespace AuthServer
 
         protected override void DoPost(CoapExchange exchange)
         {
+            exchange.Accept();
+
             IntrospectRequest requestIn = new IntrospectRequest(exchange.Request.Payload);
 
             //  Turn the token into a CWT
@@ -37,16 +39,29 @@ namespace AuthServer
             KeySet _asSigningKeys = null;
 
             try {
-                CWT cwt = CWT.Decode(requestIn.Token, _myKeys, _asSigningKeys);
+                if (!OauthResource.KeysForIntrospection.ContainsKey(requestIn.Token)) {
+                    throw new OauthException(StatusCode.BadRequest, OauthResource.ErrorCodes.Invalid_Request, "Unrecognized Token");
+                }
+
+                CWT cwt = OauthResource.KeysForIntrospection[requestIn.Token];
 
                 IntrospecResponse response = new IntrospecResponse();
                 response.Active = true;
-                response.Scope = "scope->foobar";
-                response.Profile = "coap_dtls";
-                response.Cnf = cwt.Cnf;
 
+                if (cwt.ExperationTime < DateTime.Now) {
+                    response.Active = false;
+                }
+
+                response.Scope = cwt.GetClaim(ClaimId.Scope);
+                response.Audience = cwt.GetClaim(ClaimId.Audience).AsString();
+                response.Profile = (int) ProfileIds.Coap_Dtls;
+                response.Cnf = cwt.Cnf;
+                
                 exchange.Respond(StatusCode.Content, response.EncodeToBytes(), MediaType.ApplicationOctetStream);
 
+            }
+            catch (OauthException e) {
+                exchange.Respond(e.Error, e.Body);
             }
             catch (Exception e) {
                 //  Something went wrong 

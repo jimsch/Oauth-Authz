@@ -12,63 +12,122 @@ namespace Com.AugustCellars.CoAP.OAuth
     public class Response
     {
         private Request _request;
-        private CBORObject _map = CBORObject.NewMap();
+        private Dictionary<Oauth_Parameter, CBORObject> _values = new Dictionary<Oauth_Parameter, CBORObject>();
 
         public Response(Request request)
         {
             _request = request;
         }
 
-        public Response(byte[] encoded)
+        private Response(CBORObject resp)
         {
-            _map = CBORObject.DecodeFromBytes(encoded);
-            if (_map.Type != CBORType.Map) throw new Exception("Invalid Encoding");
+            if (resp.Type != CBORType.Map) throw new Exception("Invalid Encoding");
 
-
+            _values = new Dictionary<Oauth_Parameter, CBORObject>();
+            foreach (CBORObject key in resp.Keys) {
+                if (key.Type == CBORType.Number) {
+                    _values.Add(Oauth_Parameter.IntDictionary[key.AsInt32()], resp[key]);
+                }
+                else if (key.Type == CBORType.TextString) {
+                    Oauth_Parameter p;
+                    if (!Oauth_Parameter.NameDictionary.TryGetValue(key.AsString(), out p)) {
+                        p = new Oauth_Parameter(key.AsString(), resp[key].Type);
+                    }
+                    _values.Add(p, resp[key]);
+                }
+                else {
+                    throw new Exception("Invalid key in the request");
+                }
+            }
         }
 
-        public  CBORObject this[CBORObject key]
+        public static Response FromCBOR(byte[] cbor)
         {
-            get => _map[key];
-            set => _map[key] = value;
+            CBORObject obj = CBORObject.DecodeFromBytes(cbor);
+            return new Response(obj);
         }
 
-
-        public byte[] BuildReply()
+        public static Response FromJSON(string json)
         {
-            CBORObject obj = CBORObject.NewMap() ;
+            CBORObject obj = CBORObject.FromJSONString(json);
+            return new Response(obj);
+        }
 
-            // Set Profile
-            // Set cnf
-            // Set access_token
-            // Set expires_in
+        public  CBORObject this[Oauth_Parameter key]
+        {
+            get => _values[key];
+            set => _values[key] = value;
+        }
 
-
-
-            return obj.EncodeToBytes();
+        public bool ContainsKey(Oauth_Parameter key)
+        {
+            return _values.ContainsKey(key);
         }
 
         public byte[] EncodeToBytes()
         {
-            return _map.EncodeToBytes();
+            CBORObject obj = CBORObject.NewMap();
+            foreach (KeyValuePair<Oauth_Parameter, CBORObject> kv in _values) {
+                obj.Add(kv.Key.Key, kv.Value);
+            }
+            return obj.EncodeToBytes();
         }
 
-        public string Profile {
-            get => _map[(CBORObject)Oauth_Parameter.Profile].AsString();
-            set => _map[(CBORObject)Oauth_Parameter.Profile] = CBORObject.FromObject(value);
+        public string EncodeToJson()
+        {
+            CBORObject obj = CBORObject.NewMap();
+            foreach (KeyValuePair<Oauth_Parameter, CBORObject> kv in _values) {
+                CBORObject newValue = kv.Value;
+
+                if (kv.Key.ToJSON != null) {
+                    newValue = kv.Key.ToJSON(newValue);
+                }
+
+                if (newValue.Type == CBORType.ByteString) {
+                    char[] rgch = new char[newValue.GetByteString().Length * 2];
+                    Convert.ToBase64CharArray(newValue.GetByteString(), 0, newValue.GetByteString().Length, rgch, 0,
+                                              Base64FormattingOptions.None);
+                    newValue = CBORObject.FromObject(rgch.ToString());
+                }
+
+
+
+                obj.Add(kv.Key.KeyJson, newValue);
+            }
+            return obj.ToJSONString();
         }
 
+        public ProfileIds Profile {
+            get => (ProfileIds) _values[Oauth_Parameter.Profile].AsInt32();
+            set => _values[Oauth_Parameter.Profile] = CBORObject.FromObject(value);
+        }
 
         public byte[] Token
         {
-            get => _map[(CBORObject) Oauth_Parameter.Access_Token].GetByteString();
-            set => _map[(CBORObject) Oauth_Parameter.Access_Token] = CBORObject.FromObject(value);
+            get => _values[Oauth_Parameter.Access_Token].GetByteString();
+            set => _values[Oauth_Parameter.Access_Token] = CBORObject.FromObject(value);
         }
 
         public Confirmation Confirmation
         {
-            get => new Confirmation(_map[(CBORObject) Oauth_Parameter.Cnf]);
-            set => _map[(CBORObject)Oauth_Parameter.Cnf] = value.AsCBOR;
+            get {
+                if (_values.ContainsKey(Oauth_Parameter.Cnf)) {
+                    return new Confirmation(_values[Oauth_Parameter.Cnf]);
+                }
+                else return null;
+            }
+            set => _values[Oauth_Parameter.Cnf] = value.AsCBOR;
+        }
+
+        public Confirmation RsConfirmation
+        {
+            get {
+                if (_values.ContainsKey(Oauth_Parameter.Rs_cnf)) {
+                    return new Confirmation(_values[Oauth_Parameter.Rs_cnf]);
+                }
+                else return null;
+            }
+            set => _values[Oauth_Parameter.Rs_cnf] = value.AsCBOR;
         }
     }
 }

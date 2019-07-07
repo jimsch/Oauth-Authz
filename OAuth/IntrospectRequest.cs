@@ -25,14 +25,14 @@ namespace Com.AugustCellars.CoAP.OAuth
 
         public byte[] Token
         {
-            get => _data["token"].GetByteString();
-            set => _data["token"] = CBORObject.FromObject(value);
+            get => _data[CBORObject.FromObject(  27)].GetByteString();
+            set => _data[CBORObject.FromObject(27)] = CBORObject.FromObject(value);
         }
 
         public CBORObject TokenTypeHint
         {
-            get => _data["token_type_hint"];
-            set => _data["token_type_hint"] = value;
+            get => _data[CBORObject.FromObject(28)];
+            set => _data[CBORObject.FromObject(28)] = value;
         }
 
         public byte[] EncodeToBytes()

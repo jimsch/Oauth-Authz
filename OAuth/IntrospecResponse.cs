@@ -45,8 +45,14 @@ namespace Com.AugustCellars.CoAP.OAuth
 
         public bool Active
         {
-            get => _data["active"].AsBoolean();
-            set => _data["active"] = CBORObject.FromObject(value);
+            get => _data[CBORObject.FromObject(29)].AsBoolean();
+            set => _data[CBORObject.FromObject(29)] = CBORObject.FromObject(value);
+        }
+
+        public string Audience
+        {
+            get => _data[CBORObject.FromObject(3)].AsString();
+            set => _data[CBORObject.FromObject(3)] = CBORObject.FromObject(value);
         }
 
         public byte[] ClientToken
@@ -57,19 +63,19 @@ namespace Com.AugustCellars.CoAP.OAuth
 
         public Confirmation Cnf
         {
-            get => new Confirmation(_data["cnf"]);
-            set => _data["cnf"] = value.AsCBOR;
+            get => new Confirmation(_data[CBORObject.FromObject(25)]);
+            set => _data[CBORObject.FromObject(25)] = value.AsCBOR;
         }
 
-        public String Profile {
-            get => _data["profile"].AsString();
-            set => _data["profile"] = CBORObject.FromObject(value);
+        public int Profile {
+            get => _data[CBORObject.FromObject(26)].AsInt32();
+            set => _data[CBORObject.FromObject(26)] = CBORObject.FromObject(value);
         }
 
-        public String Scope
+        public CBORObject Scope
         {
-            get => _data["scope"].AsString();
-            set => _data["scope"] = CBORObject.FromObject(value);
+            get => _data[CBORObject.FromObject(12)];
+            set => _data[CBORObject.FromObject(12)] = value;
         }
 
         public byte[] EncodeToBytes()

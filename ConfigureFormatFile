@@ -1,0 +1,31 @@
+Map of top level needs
+
+- AS Server Description
+      Keys for signing CWTs
+
+- Resource Server Description:
+      Authority Name
+      Scope List
+      	    Permission Set #
+      Supported profiles
+           coap_dtls
+	       support PSK?
+	       PSK algorithms
+	       
+	       raw public key(s)
+	  coap_oscore
+		server id
+		algorithms
+      CWT encryption key
+
+
+
+***
+Scope Name
+  * Method Nmaes
+    * Users w/ access
+    * profiles
+
+****
+
+<authority, scope, action, user> ==> Methods + profile

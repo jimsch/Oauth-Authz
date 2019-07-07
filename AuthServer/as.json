@@ -1,0 +1,242 @@
+{
+    "Resources": [
+	{ 
+	    "AudienceName": [ "coap://localhost", "coaps://localhost" ],
+	    "Scopes": [
+		{
+		    "Name": "ace-echo",
+		    "Authorizations": [
+			[ "/ace-echo", ["GET", "PUT", "POST"]]
+		    ],
+		    "Rules": {
+			"keys": [
+			    "c_key1", "c_key2", "c_key3"
+			]
+		    },
+		    "Profiles": ["coap-dtls"]
+		},
+		{
+		    "Name": "/ace-echo2",
+		    "Authorizations": [
+			[ "/ace-echo2", ["get", "put"]]
+		    ],
+		    "Rules": {
+			"keys": [
+			    "c_key1", "c_key2", "c_key3"
+			]
+		    },
+		    "Profiles": ["coap-dtls"]
+		},
+		{
+		    "Name": "foobar",
+		    "Authorizations": [
+			[ "/ace-echo", ["GET", "POST"]],
+			[ "/ace-echo2", ["GET", "put"]]
+		    ],
+		    "Rules": {
+			"keys": [
+			    "c_key1", "c_key2", "c_key3"
+			]
+		    },
+		    "Profiles": ["coap-dtls"]
+		},
+		{
+		    "Name": "read",
+		    "Authorizations": [
+			[ "/ace-echo", ["GET"]],
+			[ "/ace-echo2", ["GET"]]
+		    ],
+		    "Rules": {
+			"keys": [
+			    "c_key1", "c_key2", "c_key3"
+			]
+		    },
+		    "Profiles": ["coap-dtls"]
+		},
+                {
+                    "Name": "helloWorld",
+                    "Authorizations": [
+                        ["helloWorld", ["GET", "PUT", "POST"]],
+                        ["HelloWorld", ["GET", "PUT", "POST"]]
+                    ],
+                    "Rules": {
+                        "keys": [ "io_client1", "io_psk1" ]
+                    },
+                    "Profiles": ["coap-dtls"]
+                },
+                {
+                    "Name": "intro",
+                    "Authorizations": [
+                        ["helloWorld", ["GET", "PUT", "POST"]],
+                        ["HelloWorld", ["GET", "PUT", "POST"]],
+                        ["intro", ["GET", "PUT", "POST"]]
+                    ],
+                    "Rules": {
+                        "keys": [ "io_client1", "io_psk1" ]
+                    },
+                    "Profiles": ["coap-dtls"],
+                    "Introspection": 1
+                }
+	    ]
+	},
+        {
+            "AudienceName": [ "RS1" ],
+            "Scopes": [
+                {
+                    "Name": "helloWorld",
+                    "Authorizations": [
+                        ["helloWorld", ["GET", "PUT", "POST"]],
+                        ["HelloWorld", ["GET", "PUT", "POST"]]
+                    ],
+                    "Rules": {
+                        "keys": [ "io_client1" ]
+                    },
+                    "Profiles": ["coap-dtls"]
+                },
+                {
+                    "Name": "helloWorld",
+                    "Authorizations": [
+                        ["helloWorld", ["GET", "PUT", "POST"]],
+                        ["HelloWorld", ["GET", "PUT", "POST"]]
+                    ],
+                    "Rules": {
+                        "keys": [ "io_psk2", "io_client1" ]
+                    },
+                    "Profiles": ["coap-dtls"],
+                    "RS Key": {
+                        "profile": "coap-dtls-psk",
+                        "scope": "string"
+                    }
+                },
+                {
+                    "Name": "r_Lock",
+                    "Authorizations": [
+                        ["r_Lock", ["GET"]]
+                    ],
+                    "Rules": {
+                        "keys": [ "io_client1", "io_psk4", "io_client2" ]
+                    },
+                    "Profiles": ["coap-dtls"],
+                    "RS Key": {
+                        "profile": "coap-dtls-psk",
+                        "scope": "string"
+                    }
+                },
+                {
+                    "Name": "rw_Lock",
+                    "Authorizations": [
+                        ["rw_Lock", ["GET"]]
+                    ],
+                    "Rules": {
+                        "keys": [ "io_client1" ]
+                    },
+                    "Profiles": ["coap-dtls"]
+                }
+            ]
+        },
+        {
+            "AudienceName": [ "RS2" ],
+            "Scopes": [
+                {
+                    "Name": "helloWorld",
+                    "Authorizations": [
+                        ["helloWorld", ["GET", "PUT", "POST"]],
+                        ["HelloWorld", ["GET", "PUT", "POST"]]
+                    ],
+                    "Rules": {
+                        "keys": [ "io_client1" ]
+                    },
+                    "Profiles": ["coap-dtls"],
+                    "RS Key": {
+                        "profile": "coap-dtls-rpk",
+                        "scope": "string"
+                    }
+                },
+                {
+                    "Name": "r_Lock",
+                    "Authorizations": [
+                        ["r_Lock", ["GET", "PUT", "POST"]]
+                    ],
+                    "Rules": {
+                        "keys": [ "io_client1", "io_client2" ]
+                    },
+                    "Profiles": ["coap-oscore"]
+                },
+                {
+                    "Name": "r_lock",
+                    "Authorizations": [
+                        ["r_Lock", ["GET", "PUT", "POST"]]
+                    ],
+                    "Rules": {
+                        "keys": [ "io_client1", "io_client2" ]
+                    },
+                    "Profiles": ["coap-dtls"]
+                }
+            ]
+        }
+        
+    ],
+    "ClientKeys": [
+	{
+	    "name": "c_key1",
+	    "Profiles": ["coap-dtls"],
+	    "Key": "{1:4,2:'ACE_KID1',-1:h'02030405060708090a0b'}"
+	},
+	{
+	    "name": "c_key2",
+	    "Profiles": ["coap-oscoap"],
+	    "Key": "{1:4,2:'ACE_KID2',-1:h'0c02030405060708090a0b'}"
+	},
+        {
+            "comment": "This is the first shared secret PSK for OAuth Testing",
+            "name": "io_psk1",
+            "Profiles": ["coap-dtls"],
+            "Key": "{1:4,2:'client1',-1:h'6162630405060708090a0b0c0d0e0f10'}"
+        },
+        {
+            "comment": "This is the first shared secret PSK for OAuth Testing",
+            "name": "io_psk4",
+            "Profiles": ["coap-dtls"],
+            "Key": "{1:4,2:'client4',-1:h'5152530405060708090a0b0c0d0e0f10'}"
+        },
+        {
+            "comment": "This is the second shared secret PSK for OAuth Testing",
+            "name": "io_psk2",
+            "Profiles": ["coap-dtls"],
+            "Key": "{1:4,2:'client2',-1:h'0102030405060708090a0b0c0d0e0f10'}"
+        },
+        {
+            "comment": "This is the first client RPK for OAuth Testing",
+            "name": "io_client1",
+            "Profiles":["coap-dtls"],
+            "Key": "{1: 2, -1: 1,-2: h'12D6E8C4D28F83110A57D253373CAD52F01BC447E4093541F643B385E179C110',-3: h'283B3D8D28FFA59FE5CB540412A750FA8DFA34F6DA69BCDA68400D679C1347E8'}"
+        },
+        {
+            "comment": "OSCORE key for Client->AS",
+            "name": "io_client2",
+            "Profiles":["coap-oscoap"],
+            "Key": "{1:4,2:'os1',6:'clId',7:'asSrId',-1:h'100f0e0d0c0b0a090a07060504636261'}"
+        }
+    ],
+    "ResourceServerKeys": [
+	{
+	    "name": "m_key1",
+	    "Key": "{1:4,2:'AS_RS',-1:h'0f0b02030405060708090a'}",
+	    "Profiles": ["coap-dtls"]
+	},
+        {
+            "comment": "This is the first RS PRK for Oauth Testing",
+            "name": "io_rs1",
+            "Profiles":["coap-dtls"],
+            "Key": "{1: 2, 3:-7, -1:1, -2: h'73B7D755827D5D59D73FD4015D47B445762F7CDB59799CD966714AB2727F1BA5',-3: h'1A84F5C82797643D33F7E6E6AFCF016522238CE430E1BF21A218E6B4DEEAC37A',-4: h'00EA086573C683477D74EB7A0C63A6D031D5DEB10F3CC2876FDA6D3400CAA4E507'}"
+        }
+    ],
+    "AuthServerKeys": [
+        {
+            "comment": "This is the first AS RPK for Oauth Testing",
+            "name": "io_as1",
+            "Key": "{1: 2, 3:-7, -1: 1,-2: h'058F35F3C0D34D3DF50DEBC82208CDA9BE373AF7B8F7AAC381577B144D5FA781',-3: h'364269649744067D4600A529AE12076750D90C5EFCD9835137DB1AE2B4BACCB8',-4: h'0089A92D07B34F1D806FABFF444AF6507C5F18F47BB2CCFAA7FBEC447303790D53'}",
+            "Profiles":[]
+        }
+    ]
+}

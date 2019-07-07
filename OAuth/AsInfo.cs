@@ -21,7 +21,18 @@ namespace Com.AugustCellars.CoAP.OAuth
             _map = CBORObject.DecodeFromBytes(encodedBytes);
         }
 
-     
+        /// <summary>
+        /// Make a shallow copy so that a new map exists,
+        /// M00BUG does not make a copy of the values, but re-uses the same value object
+        /// </summary>
+        /// <param name="copy"></param>
+        public AsInfo(AsInfo copy)
+        {
+            _map = CBORObject.NewMap();
+            foreach (CBORObject key in copy._map.Keys) {
+                _map.Add(key, copy._map[key]);
+            }
+        }
 
         public string ASServer
         {
